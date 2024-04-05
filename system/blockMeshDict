@@ -1,0 +1,255 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+scale   0.001;
+
+
+percentClosed       25; 
+
+
+aThroat       9.3189655;
+topInlet      20.43002552;
+botInlet      11; 
+hInlet        #eval "$topInlet - $botInlet";
+
+height        60;
+left          -15;
+right         90;
+
+halfBase      #eval "($percentClosed/100.0*$aThroat)/2.0"; // 100.0 to turn it into a float
+halfOpen      #eval "($hInlet - 2.0*$halfBase)/2.0";
+
+midInlet      #eval "($topInlet - $botInlet)/2 + $botInlet";
+
+protrusion    #eval "($right - 2.0*$halfBase)";
+
+
+bot           #eval "$botInlet + $halfOpen"; // location of top of plug in the outlet
+upp           #eval "$topInlet - $halfOpen"; // bottom of plug on outlet
+
+
+
+
+
+// sizing
+
+inletSplitY   40;
+ySplitBot     $inletSplitY;
+ySplitMid     $inletSplitY;
+ySplitTop     #eval "$inletSplitY*2";
+
+leftSplitX    20;
+ramp1X        25;
+ramp2XA       30;
+ramp2XB       25;
+
+diffuser      50; 
+
+plugX         #eval "round($diffuser/22*$percentClosed*0.1)";
+
+cowlTopX      35;
+
+cowlTopRightX  20;
+
+
+
+
+
+
+
+// grading
+bottomGrad   ((.1 .2 4) (.9 .8 1));
+midGrad      ((.9 .8 1) (.1 .2 .25));
+topGrad      ((.1 .3 8) (.9 .5 4));
+
+
+
+
+
+vertices
+(
+    ($left 0 0) // 0
+    (15 0 0)
+    (30 1.998763 0)
+    (45 6.21809272 0)
+    (62 $botInlet 0)
+    ($protrusion  $botInlet 0) // 5
+    ($right $botInlet 0) 
+    ($right $bot 0)
+    ($protrusion  $midInlet 0)
+    ($right $upp 0)
+    ($right $topInlet 0) // 10
+    ($protrusion $topInlet 0)
+    (66 $topInlet 0)
+    (52 18.43002552 0)
+    (69 24.43002552 0)
+    ($right 24.43002552 0) // 15
+    ($right $height 0) 
+    (69 $height 0)
+    (52 $height 0)
+    (30 $height 0)
+    (15 $height 0) // 20
+    ($left $height 0)
+    ($left 15 0)
+    ($left 7.5 0)
+    (15 15 0)
+    (30 16 0) // 25
+    (15 7.5 0)
+    (30 8.5 0)
+    (49.2 13 0)
+    (63.8 $midInlet 0) 
+    ($left 0 1) // 30
+    (15 0 1)
+    (30 1.998763 1)
+    (45 6.21809272 1)
+    (62 $botInlet 1)
+    ($protrusion  $botInlet 1) // 35
+    ($right $botInlet 1) 
+    ($right $bot 1)
+    ($protrusion  $midInlet 1)
+    ($right $upp 1)
+    ($right $topInlet 1) // 40
+    ($protrusion $topInlet 1)
+    (66 $topInlet 1)
+    (52 18.43002552 1)
+    (69 24.43002552 1)
+    ($right 24.43002552 1) // 45
+    ($right $height 1) 
+    (69 $height 1)
+    (52 $height 1)
+    (30 $height 1)
+    (15 $height 1) // 50
+    ($left $height 1)
+    ($left 15 1)
+    ($left 7.5 1)
+    (15 15 1)
+    (30 16 1) // 55
+    (15 7.5 1)
+    (30 8.5 1)
+    (49.2 13 1)
+    (63.8 $midInlet 1)
+);
+
+blocks
+(
+    hex (0 1 26 23 30 31 56 53) ($leftSplitX $ySplitBot 1) simpleGrading (1 $bottomGrad 1) // 1 bottom 
+    hex (1 2 27 26 31 32 57 56) ($ramp1X $ySplitBot 1) simpleGrading (1 $bottomGrad 1) // 2 bottom 
+    hex (2 3 28 27 32 33 58 57) ($ramp2XA $ySplitBot 1) simpleGrading (1 $bottomGrad 1) // 3 bottom 
+    hex (3 4 29 28 33 34 59 58) ($ramp2XB $ySplitBot 1) simpleGrading (1 $bottomGrad 1) // 4 bottom 
+    hex (4 5 8 29 34 35 38 59) ($diffuser $ySplitBot 1) simpleGrading (1 $bottomGrad 1) // 5 bottom 
+    hex (5 6 7 8 35 36 37 38) ($plugX $ySplitBot 1) simpleGrading (1 $bottomGrad 1) // 6 bottom 
+    hex (23 26 24 22 53 56 54 52) ($leftSplitX $ySplitMid 1) simpleGrading (1 $midGrad 1) // 7 middle 
+    hex (26 27 25 24 56 57 55 54) ($ramp1X $ySplitMid 1) simpleGrading (1 $midGrad 1) // 8 middle 
+    hex (27 28 13 25 57 58 43 55) ($ramp2XA $ySplitMid 1) simpleGrading (1 $midGrad 1) // 9 middle 
+    hex (28 29 12 13 58 59 42 43) ($ramp2XB $ySplitMid 1) simpleGrading (1 $midGrad 1) // 10 middle 
+    hex (29 8 11 12 59 38 41 42) ($diffuser $ySplitMid 1) simpleGrading (1 $midGrad 1) // 11 middle 
+    hex (8 9 10 11 38 39 40 41) ($plugX $ySplitMid 1) simpleGrading (1 $midGrad 1) // 12 middle 
+    hex (22 24 20 21 52 54 50 51) ($leftSplitX $ySplitTop 1) simpleGrading (1 $topGrad 1) // 13 top 
+    hex (24 25 19 20 54 55 49 50) ($ramp1X $ySplitTop 1) simpleGrading (1 $topGrad 1) // 14 top 
+    hex (25 13 18 19 55 43 48 49) ($ramp2XA $ySplitTop 1) simpleGrading (1 $topGrad 1) // 15 top 
+    hex (13 14 17 18 43 44 47 48) ($cowlTopX $ySplitTop 1) simpleGrading (1 $topGrad 1) // 16 top 
+    hex (14 15 16 17 44 45 46 47) ($cowlTopRightX $ySplitTop 1) simpleGrading (1 $topGrad 1) // 17 top 
+);
+
+edges
+(
+);
+
+boundary
+(
+    inlet1
+    {
+        type patch;
+        faces
+        (
+            (0 30 53 23)
+            (23 53 52 22)
+            (22 52 51 21)
+        );
+    }
+    
+    
+    outlet1 
+    {
+        type patch;
+        faces
+        (
+            (15 16 46 45)
+        );
+    }
+
+    outlet2
+    {
+        type patch;
+        faces
+        (
+            (9 10 40 39)
+            (6 7 37 36)
+        );
+    }
+    
+    bottom
+    {
+        type symmetryPlane;
+        faces
+        (
+            (0 1 31 30)
+        );
+    }
+
+
+
+    top
+    {
+        type patch;
+        faces
+        (
+            (21 51 50 20)
+            (20 50 49 19)
+            (19 49 48 18)
+            (18 48 47 17)
+            (17 47 46 16)
+        );
+    }
+
+    wall1
+    {
+        type wall;
+        faces
+        (
+            (1 2 32 31)
+            (2 3 33 32)
+            (3 4 34 33)
+            (4 5 35 34)
+            (5 6 36 35)
+            (7 8 38 37)
+            (8 9 39 38)
+            (10 11 41 40)
+            (11 12 42 41)
+            (12 13 43 42)
+            (13 14 44 43)
+            (14 15 45 44)
+        );
+    }
+
+);
+
+mergePatchPairs
+(
+);
+
+
+// ************************************************************************* //

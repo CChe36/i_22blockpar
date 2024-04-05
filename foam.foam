@@ -1,0 +1,8 @@
+inviscid version of 2.2 inlet
+cell number about 19k
+decomposed
+blockMesh
+trying vanAlbada
+expanded domain
+freestream initial conditions
+viscous - make sure to change mu in thermophysicalProps to not 0
